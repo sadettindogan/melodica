@@ -205,6 +205,9 @@ if st.session_state.selected_song is None:
     st.stop()
 
 song = st.session_state.selected_song
+if song not in songs:
+    st.session_state.selected_song = None
+    st.rerun()
 notes = songs[song]
 
 st.markdown("---")
