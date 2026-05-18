@@ -1,6 +1,8 @@
 import streamlit as st
 import random
-from streamlit_player import st_player
+import subprocess
+import tempfile
+import os
 
 st.set_page_config(page_title="Melodi Dedektifi", page_icon="🎵", layout="wide")
 
@@ -9,63 +11,97 @@ st.set_page_config(page_title="Melodi Dedektifi", page_icon="🎵", layout="wide
 # ---------------------------------------------------
 songs = {
     # --- GİTAR ENSTRÜMANLERİ ---
-    "Smoke On The Water":           "https://www.youtube.com/watch?v=aBo-AGCDpPM",
-    "Classical Gas":                "https://www.youtube.com/watch?v=Ht_sPFyQtjc",
-    "Apache":                       "https://www.youtube.com/watch?v=AOIkGkPl1f8",
-    "Eruption":                     "https://www.youtube.com/watch?v=yNOkPKuxaV0",
-    "Cliffs Of Dover":              "https://www.youtube.com/watch?v=rj4fPBSCKbg",
-    "Europa":                       "https://www.youtube.com/watch?v=JyhF5zYKyDY",
-    "Albatross":                    "https://www.youtube.com/watch?v=6W_I7zgLmY4",
-    "Jessica":                      "https://www.youtube.com/watch?v=lAkj7UAumxo",
+    "Smoke On The Water":             "https://www.youtube.com/watch?v=aBo-AGCDpPM",
+    "Classical Gas":                  "https://www.youtube.com/watch?v=Ht_sPFyQtjc",
+    "Apache":                         "https://www.youtube.com/watch?v=AOIkGkPl1f8",
+    "Eruption":                       "https://www.youtube.com/watch?v=yNOkPKuxaV0",
+    "Cliffs Of Dover":                "https://www.youtube.com/watch?v=rj4fPBSCKbg",
+    "Europa":                         "https://www.youtube.com/watch?v=JyhF5zYKyDY",
+    "Albatross":                      "https://www.youtube.com/watch?v=6W_I7zgLmY4",
+    "Jessica":                        "https://www.youtube.com/watch?v=lAkj7UAumxo",
     "Always With Me Always With You": "https://www.youtube.com/watch?v=KuD03I6THGI",
-    "Little Wing":                  "https://www.youtube.com/watch?v=hg5qFDLhPMw",
+    "Little Wing":                    "https://www.youtube.com/watch?v=hg5qFDLhPMw",
     # --- FİLM & DİZİ MÜZİKLERİ ---
-    "Game Of Thrones Theme":        "https://www.youtube.com/watch?v=QtkoEFbFGiQ",
-    "Pirates Of Caribbean Theme":   "https://www.youtube.com/watch?v=27mB8verLK8",
-    "Harry Potter Theme":           "https://www.youtube.com/watch?v=LylntHK8Avg",
-    "Star Wars Theme":              "https://www.youtube.com/watch?v=_D0ZQPqeJkk",
-    "Godfather Theme":              "https://www.youtube.com/watch?v=2KxYMVOjfHs",
-    "Mission Impossible Theme":     "https://www.youtube.com/watch?v=XAYhNHhxN0A",
-    "Schindlers List Theme":        "https://www.youtube.com/watch?v=bs-elRmLvb4",
-    "Interstellar Theme":           "https://www.youtube.com/watch?v=UDVtMYqUAyw",
-    "Gladiator Now We Are Free":    "https://www.youtube.com/watch?v=yMb2OuFEaT8",
-    "James Bond Theme":             "https://www.youtube.com/watch?v=ySAIBhIpqgY",
+    "Game Of Thrones Theme":          "https://www.youtube.com/watch?v=QtkoEFbFGiQ",
+    "Pirates Of Caribbean Theme":     "https://www.youtube.com/watch?v=27mB8verLK8",
+    "Harry Potter Theme":             "https://www.youtube.com/watch?v=LylntHK8Avg",
+    "Star Wars Theme":                "https://www.youtube.com/watch?v=_D0ZQPqeJkk",
+    "Godfather Theme":                "https://www.youtube.com/watch?v=2KxYMVOjfHs",
+    "Mission Impossible Theme":       "https://www.youtube.com/watch?v=XAYhNHhxN0A",
+    "Schindlers List Theme":          "https://www.youtube.com/watch?v=bs-elRmLvb4",
+    "Interstellar Theme":             "https://www.youtube.com/watch?v=UDVtMYqUAyw",
+    "Gladiator Now We Are Free":      "https://www.youtube.com/watch?v=yMb2OuFEaT8",
+    "James Bond Theme":               "https://www.youtube.com/watch?v=ySAIBhIpqgY",
     # --- KLASİK MÜZİK ---
-    "Ode To Joy":                   "https://www.youtube.com/watch?v=_2EslFRhbic",
-    "Canon In D":                   "https://www.youtube.com/watch?v=NlprozGcs80",
-    "Fur Elise":                    "https://www.youtube.com/watch?v=_mVW8tgGY_w",
-    "Eine Kleine Nachtmusik":       "https://www.youtube.com/watch?v=oy2zDJPIgwc",
-    "Four Seasons Spring":          "https://www.youtube.com/watch?v=6LAPFM3ugag",
-    "Moonlight Sonata":             "https://www.youtube.com/watch?v=4Tr0otuiQuU",
-    "Clair De Lune":                "https://www.youtube.com/watch?v=CvFH_6DNRCY",
-    "Bolero":                       "https://www.youtube.com/watch?v=HBNKRNKh980",
-    "Flight Of The Bumblebee":      "https://www.youtube.com/watch?v=aYAJopwEYv8",
-    "Swan Lake Theme":              "https://www.youtube.com/watch?v=9cP0pkBFpYU",
+    "Ode To Joy":                     "https://www.youtube.com/watch?v=_2EslFRhbic",
+    "Canon In D":                     "https://www.youtube.com/watch?v=NlprozGcs80",
+    "Fur Elise":                      "https://www.youtube.com/watch?v=_mVW8tgGY_w",
+    "Eine Kleine Nachtmusik":         "https://www.youtube.com/watch?v=oy2zDJPIgwc",
+    "Four Seasons Spring":            "https://www.youtube.com/watch?v=6LAPFM3ugag",
+    "Moonlight Sonata":               "https://www.youtube.com/watch?v=4Tr0otuiQuU",
+    "Clair De Lune":                  "https://www.youtube.com/watch?v=CvFH_6DNRCY",
+    "Bolero":                         "https://www.youtube.com/watch?v=HBNKRNKh980",
+    "Flight Of The Bumblebee":        "https://www.youtube.com/watch?v=aYAJopwEYv8",
+    "Swan Lake Theme":                "https://www.youtube.com/watch?v=9cP0pkBFpYU",
     # --- TÜRK ENSTRÜMANLERİ ---
-    "Hicaz Longa":                  "https://www.youtube.com/watch?v=UaO8jqHh3YY",
-    "Nihavent Longa":               "https://www.youtube.com/watch?v=YMeFiFbqL5s",
-    "Segah Saz Semaisi":            "https://www.youtube.com/watch?v=KkWi5lF1cK8",
-    "Usskudar":                     "https://www.youtube.com/watch?v=8M1gI4BNWCQ",
-    "Kapilar":                      "https://www.youtube.com/watch?v=Qv7REtFSKoA",
-    # --- DÜNYA MÜZİĞİ / FLAMENCO ---
-    "Recuerdos De La Alhambra":     "https://www.youtube.com/watch?v=sUMGfCOOKao",
-    "Asturias":                     "https://www.youtube.com/watch?v=MaGGNFfQ_yw",
-    "Malagena":                     "https://www.youtube.com/watch?v=1dHQJNg6hRA",
-    "Spanish Romance":              "https://www.youtube.com/watch?v=1BNwBuNb2GI",
-    "La Paloma":                    "https://www.youtube.com/watch?v=PO3MUddlzyA",
+    "Hicaz Longa":                    "https://www.youtube.com/watch?v=UaO8jqHh3YY",
+    "Nihavent Longa":                 "https://www.youtube.com/watch?v=YMeFiFbqL5s",
+    "Segah Saz Semaisi":              "https://www.youtube.com/watch?v=KkWi5lF1cK8",
+    "Uskudar":                        "https://www.youtube.com/watch?v=8M1gI4BNWCQ",
+    "Kapilar":                        "https://www.youtube.com/watch?v=Qv7REtFSKoA",
+    # --- FLAMENKO & DÜNYA ---
+    "Recuerdos De La Alhambra":       "https://www.youtube.com/watch?v=sUMGfCOOKao",
+    "Asturias":                       "https://www.youtube.com/watch?v=MaGGNFfQ_yw",
+    "Malagena":                       "https://www.youtube.com/watch?v=1dHQJNg6hRA",
+    "Spanish Romance":                "https://www.youtube.com/watch?v=1BNwBuNb2GI",
+    "La Paloma":                      "https://www.youtube.com/watch?v=PO3MUddlzyA",
     # --- ROCK ENSTRÜMANLERİ ---
-    "Surf Rider":                   "https://www.youtube.com/watch?v=2lKgnMlHpzc",
-    "Misirlou":                     "https://www.youtube.com/watch?v=UQlFoHvQdxg",
-    "Frankenstein":                 "https://www.youtube.com/watch?v=9l0DHjXbEqE",
-    "Wipe Out":                     "https://www.youtube.com/watch?v=p13yZAjhU0M",
-    "Green Onions":                 "https://www.youtube.com/watch?v=idEBT-NOOPY",
-    # --- AYDINLATICI / AMBIYANS ---
-    "Comptine D Un Autre Ete":      "https://www.youtube.com/watch?v=rOLuZtSzMmg",
-    "Experience":                   "https://www.youtube.com/watch?v=h_tBFMCByLk",
-    "River Flows In You":           "https://www.youtube.com/watch?v=7maJOI3QMu0",
-    "Nuvole Bianche":               "https://www.youtube.com/watch?v=ggFKLxAQBbc",
-    "Divenire":                     "https://www.youtube.com/watch?v=En5JmXZDFYI",
+    "Misirlou":                       "https://www.youtube.com/watch?v=UQlFoHvQdxg",
+    "Frankenstein":                   "https://www.youtube.com/watch?v=9l0DHjXbEqE",
+    "Wipe Out":                       "https://www.youtube.com/watch?v=p13yZAjhU0M",
+    "Green Onions":                   "https://www.youtube.com/watch?v=idEBT-NOOPY",
+    "Pipeline":                       "https://www.youtube.com/watch?v=BGMbWMJSoQk",
+    # --- AMBİYANS & PİYANO ---
+    "Comptine D Un Autre Ete":        "https://www.youtube.com/watch?v=rOLuZtSzMmg",
+    "Experience":                     "https://www.youtube.com/watch?v=h_tBFMCByLk",
+    "River Flows In You":             "https://www.youtube.com/watch?v=7maJOI3QMu0",
+    "Nuvole Bianche":                 "https://www.youtube.com/watch?v=ggFKLxAQBbc",
+    "Divenire":                       "https://www.youtube.com/watch?v=En5JmXZDFYI",
 }
+
+# ---------------------------------------------------
+# SES ÇEKME — yt-dlp ile YouTube'dan ses URL'si al
+# ---------------------------------------------------
+@st.cache_data(show_spinner=False)
+def get_audio_bytes(youtube_url: str) -> bytes | None:
+    """
+    yt-dlp ile sesi indir, bytes olarak döndür.
+    Streamlit cache sayesinde aynı parça tekrar indirilmez.
+    """
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = os.path.join(tmpdir, "audio.%(ext)s")
+            result = subprocess.run(
+                [
+                    "yt-dlp",
+                    "--no-playlist",
+                    "-f", "bestaudio[ext=webm]/bestaudio/best",
+                    "--extract-audio",
+                    "--audio-format", "mp3",
+                    "--audio-quality", "5",
+                    "-o", out_path,
+                    youtube_url,
+                ],
+                capture_output=True,
+                timeout=60,
+            )
+            mp3_path = os.path.join(tmpdir, "audio.mp3")
+            if os.path.exists(mp3_path):
+                with open(mp3_path, "rb") as f:
+                    return f.read()
+    except Exception:
+        pass
+    return None
 
 # ---------------------------------------------------
 # SESSION STATE
@@ -134,13 +170,13 @@ if st.sidebar.button("🎲 Rastgele Seç", use_container_width=True):
 st.sidebar.markdown("---")
 
 categories = {
-    "🎸 Gitar Enstrümanleri":   song_names[0:10],
-    "🎬 Film & Dizi":           song_names[10:20],
-    "🎻 Klasik Müzik":          song_names[20:30],
-    "🕌 Türk Enstrümanleri":    song_names[30:35],
-    "💃 Flamenko & Dünya":      song_names[35:40],
-    "🤘 Rock Enstrümanleri":    song_names[40:45],
-    "🌙 Ambiyans & Piyano":     song_names[45:],
+    "🎸 Gitar Enstrümanleri":  song_names[0:10],
+    "🎬 Film & Dizi":          song_names[10:20],
+    "🎻 Klasik Müzik":         song_names[20:30],
+    "🕌 Türk Enstrümanleri":   song_names[30:35],
+    "💃 Flamenko & Dünya":     song_names[35:40],
+    "🤘 Rock Enstrümanleri":   song_names[40:45],
+    "🌙 Ambiyans & Piyano":    song_names[45:],
 }
 
 for cat_name, cat_songs in categories.items():
@@ -177,13 +213,42 @@ if song not in songs:
 
 url = songs[song]
 
+# ---------------------------------------------------
+# SES OYNATICI
+# ---------------------------------------------------
 st.markdown("---")
-st.markdown("**🎵 Enstrümantal Müziği Dinle**")
-st.caption("⬇️ Aşağıdaki YouTube oynatıcısından müziği dinle, sonra tahmin et!")
 
-st_player(url, playing=False, height=80)
-st.session_state.game_started = True
+col_play1, col_play2 = st.columns([3, 1])
+with col_play1:
+    st.markdown("**🎵 Müziği Dinle**")
+with col_play2:
+    play_clicked = st.button("▶️ Çal", use_container_width=True)
 
+if play_clicked or st.session_state.game_started:
+    if not st.session_state.game_started:
+        with st.spinner("🎵 Müzik yükleniyor..."):
+            audio_bytes = get_audio_bytes(url)
+        if audio_bytes:
+            st.audio(audio_bytes, format="audio/mp3")
+            st.session_state.game_started = True
+        else:
+            st.error("Ses yüklenemedi, lütfen başka bir parça seçin.")
+            st.stop()
+    else:
+        audio_bytes = get_audio_bytes(url)
+        if audio_bytes:
+            st.audio(audio_bytes, format="audio/mp3")
+        else:
+            st.error("Ses yüklenemedi.")
+            st.stop()
+
+if not st.session_state.game_started:
+    st.info("▶️ Müziği dinlemek için **Çal** butonuna bas!")
+    st.stop()
+
+# ---------------------------------------------------
+# OYUN ALANI
+# ---------------------------------------------------
 st.markdown("---")
 st.subheader("🔍 Melodi Dedektifi")
 
