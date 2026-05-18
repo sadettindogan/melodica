@@ -1,109 +1,70 @@
 import streamlit as st
-import numpy as np
-import wave
-import tempfile
 import random
+from streamlit_player import st_player
 
 st.set_page_config(page_title="Melodi Dedektifi", page_icon="🎵", layout="wide")
 
 # ---------------------------------------------------
-# 50 ŞARKI — Yerli & Yabancı Karışık
-# Do=1 Re=2 Mi=3 Fa=4 Sol=5 La=6 Si=7
+# ŞARKILAR — { "İsim": "youtube_url" }
 # ---------------------------------------------------
 songs = {
-    # --- YABANCI KLASİKLER (25 şarkı) ---
-    "Twinkle Twinkle Little Star":   "1 1 5 5 6 6 5 4 4 3 3 2 2 1",
-    "Happy Birthday":                "1 1 2 1 4 3 1 1 2 1 5 4",
-    "Jingle Bells":                  "3 3 3 3 3 3 3 5 1 2 3",
-    "Ode To Joy":                    "3 3 4 5 5 4 3 2 1 1 2 3 3 2 2",
-    "We Will Rock You":              "1 1 3 1 1 3 1 1 3 5 5",
-    "Smoke On The Water":            "1 3 4 1 3 5 4 1 3 4 3 1",
-    "Eye Of The Tiger":              "3 3 3 1 3 3 3 1 3 5 4 3",
-    "Nothing Else Matters":          "6 5 4 5 6 5 4 3 4 5",
-    "Stairway To Heaven":            "6 5 4 3 4 5 6 7 1 2 3",
-    "Hotel California":              "3 2 1 6 1 3 5 4 3",
-    "Bohemian Rhapsody":             "5 5 5 3 4 5 6 5 4",
-    "Knockin On Heavens Door":       "1 5 6 1 5 7 1 5 6",
-    "Sweet Home Alabama":            "5 4 3 2 1 2 3 4 5",
-    "Let It Be":                     "1 3 5 6 5 3 1 3 5 7 6",
-    "Yesterday":                     "5 3 2 1 2 3 5 6 5",
-    "Imagine":                       "1 3 5 1 3 5 6 5 3 1",
-    "Wonderwall":                    "3 3 3 3 5 6 5 3 3 3",
-    "Creep":                         "1 3 4 4 1 3 4 4 6 7",
-    "Smells Like Teen Spirit":       "1 1 1 4 4 4 6 6 6 5 5 5",
-    "Come As You Are":               "3 3 3 2 3 3 3 2 4 4 4",
-    "Under The Bridge":              "5 3 2 1 2 3 5 6 5 3",
-    "Master Of Puppets":             "1 1 1 7 1 7 1 6 1",
-    "Wish You Were Here":            "5 5 3 5 5 3 5 4 3 2 3",
-    "Paint It Black":                "3 2 1 7 1 2 3 4 5",
-    "House Of The Rising Sun":       "1 3 4 6 1 3 4 6 5",
-    # --- TÜRKÇE ŞARKILAR (15 şarkı) ---
-    "Akdeniz Aksamlari":             "5 5 6 5 4 3 2 3 4 5",
-    "Sari Sacli Mavi Gozlum":        "1 2 3 4 5 4 3 2 1 7 6",
-    "Firuze":                        "5 6 5 4 3 4 5 6 5 3",
-    "Gonulcelen":                    "3 4 5 6 5 4 3 2 1 2 3",
-    "Seni Seviyorum":                "1 3 5 3 1 6 5 3 2 1",
-    "Anlatamam":                     "5 5 4 3 4 5 6 5 4 3 2",
-    "Aglama":                        "3 3 2 1 2 3 4 3 2 1 7",
-    "Kalbim Seni Secti":             "1 2 3 5 3 2 1 7 1 2 3",
-    "Donme Dolap":                   "5 5 3 3 4 4 2 2 1 1 7 7 6",
-    "Cukurova":                      "1 1 2 3 4 5 5 4 3 2 1",
-    "Yarim Istanbul":                "3 5 6 5 3 2 1 2 3 5",
-    "Bir Derdim Var":                "5 4 3 2 1 2 3 4 5 6 5",
-    "Kalp Kalbe Karsi":              "1 3 3 2 1 7 1 2 3 3",
-    "Sevdan Kadar":                  "5 5 6 5 4 3 2 1 2 3 4",
-    "Gitme":                         "3 4 5 6 5 4 3 2 3 4 5",
-    # --- FİLM & DİZİ (10 şarkı) ---
-    "Game Of Thrones":               "1 3 4 5 3 4 5 1 3 4 3 1 7",
-    "Pirates Of Caribbean":          "3 1 3 1 3 4 3 1 2 1",
-    "Harry Potter Theme":            "3 4 5 2 6 5 4 7 3 2",
-    "Star Wars Theme":               "1 1 1 5 3 2 1 5 3 2 1",
-    "Godfather Theme":               "4 3 4 2 1 2 1 7 1",
-    "Mission Impossible":            "3 4 3 4 3 6 3 4 3 2",
-    "Schindlers List":               "5 4 3 2 1 2 3 4 5 6 7",
-    "Titanic My Heart Goes On":      "5 4 3 2 3 4 5 3 2 1",
-    "Lion King Circle Of Life":      "5 5 6 5 4 3 4 5 6 7 1",
-    "James Bond Theme":              "1 3 4 5 1 3 4 5 6 5 4",
+    # --- YABANCI KLASİKLER ---
+    "Smoke On The Water":          "https://www.youtube.com/watch?v=aBo-AGCDpPM",
+    "Eye Of The Tiger":            "https://www.youtube.com/watch?v=btPJPFnesV4",
+    "Nothing Else Matters":        "https://www.youtube.com/watch?v=tAGnKpE4NCI",
+    "Stairway To Heaven":          "https://www.youtube.com/watch?v=QkF3oxziUI4",
+    "Hotel California":            "https://www.youtube.com/watch?v=BciS5krYL80",
+    "Bohemian Rhapsody":           "https://www.youtube.com/watch?v=fJ9rUzIMcZQ",
+    "Knockin On Heavens Door":     "https://www.youtube.com/watch?v=pRlFSMSRFgs",
+    "Sweet Home Alabama":          "https://www.youtube.com/watch?v=ye5BuYf8q4o",
+    "Let It Be":                   "https://www.youtube.com/watch?v=qj-oTgCOmCE",
+    "Yesterday":                   "https://www.youtube.com/watch?v=wXTJBr9tt8Q",
+    "Imagine":                     "https://www.youtube.com/watch?v=YkgkThdzX-8",
+    "Wonderwall":                  "https://www.youtube.com/watch?v=bx1Bh8ZvH84",
+    "Creep":                       "https://www.youtube.com/watch?v=XFkzRNyygfk",
+    "Smells Like Teen Spirit":     "https://www.youtube.com/watch?v=hTWKbfoikeg",
+    "Come As You Are":             "https://www.youtube.com/watch?v=vabnZ9-ex7o",
+    "Under The Bridge":            "https://www.youtube.com/watch?v=lwmKkblFxzk",
+    "Master Of Puppets":           "https://www.youtube.com/watch?v=E0ozmU9cJDg",
+    "Wish You Were Here":          "https://www.youtube.com/watch?v=IXdNnw99-Ic",
+    "Paint It Black":              "https://www.youtube.com/watch?v=O4irXQhgMqg",
+    "House Of The Rising Sun":     "https://www.youtube.com/watch?v=f_RkFcBfFDQ",
+    "We Will Rock You":            "https://www.youtube.com/watch?v=-tJYN-eG1zk",
+    "Sweet Child O Mine":          "https://www.youtube.com/watch?v=1w7OgIMMRc4",
+    "November Rain":               "https://www.youtube.com/watch?v=8SbUC-UaAxE",
+    "Comfortably Numb":            "https://www.youtube.com/watch?v=_FrOQC-zEog",
+    "Sultans Of Swing":            "https://www.youtube.com/watch?v=0fAQhSRLQnM",
+    # --- TÜRKÇE ŞARKILAR ---
+    "Firuze":                      "https://www.youtube.com/watch?v=OjQgCeBLg3s",
+    "Anlatamam":                   "https://www.youtube.com/watch?v=FpEGFBBvgHw",
+    "Bir Derdim Var":              "https://www.youtube.com/watch?v=MJFEnpDqmFk",
+    "Gonulcelen":                  "https://www.youtube.com/watch?v=qRvKSELFhO4",
+    "Seni Seviyorum":              "https://www.youtube.com/watch?v=Ue1mx_hu-bA",
+    "Yalnizlik Senfonisi":         "https://www.youtube.com/watch?v=4C6NH5bKnc8",
+    "Kalp Kalbe Karsi":            "https://www.youtube.com/watch?v=eTzSCOhPa_k",
+    "Sevdan Kadar":                "https://www.youtube.com/watch?v=o-XjSmb-GGg",
+    "Gitme":                       "https://www.youtube.com/watch?v=b7ELWAaYsKo",
+    "Donme Dolap":                 "https://www.youtube.com/watch?v=mq36KLAMdvI",
+    "Yarim Istanbul":              "https://www.youtube.com/watch?v=Ue3HF_gM8kk",
+    "Aglama":                      "https://www.youtube.com/watch?v=VqK3KsHQQmk",
+    "Kalbim Seni Secti":           "https://www.youtube.com/watch?v=UW8f7cBqVNE",
+    "Cukurova":                    "https://www.youtube.com/watch?v=FUJ3vD7KFVY",
+    "Sari Sacli Mavi Gozlum":      "https://www.youtube.com/watch?v=8S-D4VZXY3o",
+    # --- FİLM & DİZİ ---
+    "Game Of Thrones":             "https://www.youtube.com/watch?v=QtkoEFbFGiQ",
+    "Pirates Of Caribbean":        "https://www.youtube.com/watch?v=27mB8verLK8",
+    "Harry Potter Theme":          "https://www.youtube.com/watch?v=LylntHK8Avg",
+    "Star Wars Theme":             "https://www.youtube.com/watch?v=_D0ZQPqeJkk",
+    "Godfather Theme":             "https://www.youtube.com/watch?v=2KxYMVOjfHs",
+    "Mission Impossible":          "https://www.youtube.com/watch?v=XAYhNHhxN0A",
+    "Schindlers List":             "https://www.youtube.com/watch?v=bs-elRmLvb4",
+    "Titanic My Heart Goes On":    "https://www.youtube.com/watch?v=WNIPqafd4As",
+    "Lion King Circle Of Life":    "https://www.youtube.com/watch?v=GibiNy4d4gc",
+    "James Bond Theme":            "https://www.youtube.com/watch?v=ySAIBhIpqgY",
+    "Interstellar Theme":          "https://www.youtube.com/watch?v=UDVtMYqUAyw",
+    "Forrest Gump Theme":          "https://www.youtube.com/watch?v=gYPAMwPGPsU",
+    "Gladiator Now We Are Free":   "https://www.youtube.com/watch?v=yMb2OuFEaT8",
 }
-
-# ---------------------------------------------------
-# NOTA FREKANSLARI
-# ---------------------------------------------------
-note_map = {
-    "1": 261.63,
-    "2": 293.66,
-    "3": 329.63,
-    "4": 349.23,
-    "5": 392.00,
-    "6": 440.00,
-    "7": 493.88,
-}
-
-# ---------------------------------------------------
-# SES ÜRETME
-# ---------------------------------------------------
-def generate_tone(freq, duration=0.35, sample_rate=44100):
-    t = np.linspace(0, duration, int(sample_rate * duration))
-    wave_data = 0.5 * np.sin(2 * np.pi * freq * t)
-    fade = np.linspace(1, 0, len(wave_data))
-    return wave_data * fade
-
-def melody_to_audio(numbers):
-    sample_rate = 44100
-    melody = np.array([], dtype=np.float32)
-    for num in numbers.split():
-        if num in note_map:
-            tone = generate_tone(note_map[num])
-            silence = np.zeros(int(sample_rate * 0.06))
-            melody = np.concatenate((melody, tone, silence))
-    melody = np.int16(melody * 32767)
-    temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
-    with wave.open(temp_wav.name, "w") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(sample_rate)
-        wf.writeframes(melody.tobytes())
-    return temp_wav.name
 
 # ---------------------------------------------------
 # SESSION STATE
@@ -182,7 +143,7 @@ for cat_name, cat_songs in categories.items():
         for name in cat_songs:
             idx = song_names.index(name)
             is_active = st.session_state.selected_song == name
-            label = f"{'▶ ' if is_active else ''}{idx + 1}. `{songs[name]}`"
+            label = f"{'▶ ' if is_active else ''}{idx + 1}. Şarkı"
             if st.button(label, key=f"song_{idx}", use_container_width=True):
                 reset_game(name)
                 st.rerun()
@@ -191,38 +152,32 @@ for cat_name, cat_songs in categories.items():
 # ANA EKRAN
 # ---------------------------------------------------
 st.title("🎵 Melodi Dedektifi")
-st.caption("Melodiyi dinle • Harfleri tahmin et • Şarkıyı bul!")
+st.caption("Şarkıyı dinle • Harfleri tahmin et • Adını bul!")
 
 if st.session_state.selected_song is None:
     st.markdown("---")
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.info("**Nasıl Oynanır?**\n\n1. Sol panelden bir melodi seç\n2. Çal butonuna bas\n3. Harfleri tahmin et\n4. Şarkı adını bul!")
+        st.info("**Nasıl Oynanır?**\n\n1. Sol panelden bir şarkı seç\n2. YouTube'dan dinle\n3. Harfleri tahmin et\n4. Şarkı adını bul!")
     with col_b:
         st.warning("**Kurallar**\n\n• 5 hakkın var\n• Yanlış harf = 1 hak\n• Yanlış isim = 1 hak\n• 0 hak = oyun bitti!")
     with col_c:
-        st.success("**İpucu**\n\n• Önce harfleri tahmin et\n• Notaları dikkatlice dinle\n• Rastgele butonu ile şansını dene!")
+        st.success("**İpucu**\n\n• Önce harfleri tahmin et\n• Şarkıyı dikkatlice dinle\n• Rastgele butonu ile şansını dene!")
     st.stop()
 
 song = st.session_state.selected_song
 if song not in songs:
     st.session_state.selected_song = None
     st.rerun()
-notes = songs[song]
+
+url = songs[song]
 
 st.markdown("---")
-col1, col2 = st.columns([4, 1])
-with col1:
-    st.markdown(f"**Notalar:** `{notes}`")
-with col2:
-    if st.button("▶️ Melodiyi Çal", use_container_width=True):
-        wav = melody_to_audio(notes)
-        st.audio(wav)
-        st.session_state.game_started = True
+st.markdown("**🎵 Şarkıyı Dinle**")
 
-if not st.session_state.game_started:
-    st.info("▶️ Melodiyi dinlemek için **Melodiyi Çal** butonuna bas, sonra tahmin etmeye başla!")
-    st.stop()
+# YouTube player — autoplay kapalı, sadece ses için küçük boyut
+st_player(url, playing=False, height=80)
+st.session_state.game_started = True
 
 st.markdown("---")
 st.subheader("🔍 Melodi Dedektifi")
