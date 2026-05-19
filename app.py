@@ -22,6 +22,8 @@ songs = {
     "Pirates Of The Caribbean":  mp3_url("Pirates of the Caribbean.mp3"),
     "Star Wars":                 mp3_url("Star Wars.mp3"),
     "The Godfather":             mp3_url("The Godfather.mp3"),
+    "Gladiator":                 mp3_url("Gladiator.mp3"),
+}
 }
 
 categories = {
