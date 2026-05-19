@@ -131,18 +131,9 @@ url = songs[song]
 # SES OYNATICI
 # ---------------------------------------------------
 st.markdown("---")
-col1, col2 = st.columns([3, 1])
-with col1:
-    st.markdown("**🎵 Müziği Dinle**")
-with col2:
-    if st.button("▶️ Çal", use_container_width=True):
-        st.session_state.game_started = True
-
-if st.session_state.game_started:
-    st.audio(url, format="audio/mp3")
-else:
-    st.info("▶️ Müziği dinlemek için **Çal** butonuna bas, sonra tahmin et!")
-    st.stop()
+st.markdown("**🎵 Müziği Dinle**")
+st.audio(url, format="audio/mp3", autoplay=True)
+st.session_state.game_started = True
 
 # ---------------------------------------------------
 # OYUN ALANI
