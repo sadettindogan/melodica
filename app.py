@@ -13,7 +13,7 @@ def mp3_url(filename):
     return f"{BASE}/{quote(filename)}"
 
 # ---------------------------------------------------
-# ŞARKILAR — { "Görünen İsim": "dosya_adi.mp3" }
+# ŞARKILAR
 # ---------------------------------------------------
 songs = {
     "Game Of Thrones":           mp3_url("Game Of Thrones.mp3"),
@@ -22,7 +22,6 @@ songs = {
     "Star Wars":                 mp3_url("Star Wars.mp3"),
     "The Godfather":             mp3_url("The Godfather.mp3"),
     "Gladiator":                 mp3_url("Gladiator.mp3"),
-}
 }
 
 categories = {
@@ -154,7 +153,6 @@ render_hearts()
 if st.session_state.wrong_letters:
     st.markdown(f"❌ **Yanlış harfler:** `{'  '.join(st.session_state.wrong_letters)}`")
 
-# Oyun bitti
 if st.session_state.game_over:
     if st.session_state.result_type == "win":
         st.success(st.session_state.result_msg)
