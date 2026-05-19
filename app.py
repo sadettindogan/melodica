@@ -25,7 +25,8 @@ film_songs = {
 }
 
 turkce_songs = {
-    "Ağlama Ben Ağlarım":        mp3_url("Ağlama Ben Ağlarım.mp3"),
+    "Ağlama Ben Ağlarım": mp3_url("Ağlama Ben Ağlarım.mp3"),
+    "Paint It Black":         mp3_url("Paint It Black.mp3"),  # ← buraya
 }
 
 songs = {**film_songs, **turkce_songs}
