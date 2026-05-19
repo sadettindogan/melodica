@@ -7,7 +7,7 @@ st.set_page_config(page_title="Melodi Dedektifi", page_icon="🎵", layout="wide
 # ---------------------------------------------------
 # BASE URL
 # ---------------------------------------------------
-BASE = "https://raw.githubusercontent.com/sadettindogan/melodica1/main/assets"
+BASE = "https://raw.githubusercontent.com/sadettindogan/melodica/main/assets"
 
 def mp3_url(filename):
     return f"{BASE}/{quote(filename)}"
