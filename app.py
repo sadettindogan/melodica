@@ -15,7 +15,7 @@ def mp3_url(filename):
 # ---------------------------------------------------
 # ŞARKILAR
 # ---------------------------------------------------
-songs = {
+film_songs = {
     "Game Of Thrones":           mp3_url("Game Of Thrones.mp3"),
     "Harry Potter":              mp3_url("Harry Potter.mp3"),
     "Pirates Of The Caribbean":  mp3_url("Pirates of the Caribbean.mp3"),
@@ -24,8 +24,15 @@ songs = {
     "Gladiator":                 mp3_url("Gladiator.mp3"),
 }
 
+turkce_songs = {
+    "Ağlama Ben Ağlarım":        mp3_url("Ağlama Ben Ağlarım.mp3"),
+}
+
+songs = {**film_songs, **turkce_songs}
+
 categories = {
-    "🎬 Film & Dizi": list(songs.keys()),
+    "🎬 Film & Dizi":    list(film_songs.keys()),
+    "🇹🇷 Türkçe Şarkılar": list(turkce_songs.keys()),
 }
 
 # ---------------------------------------------------

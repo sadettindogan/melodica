@@ -1,0 +1,14 @@
+songs = {
+    "Game Of Thrones":           mp3_url("Game Of Thrones.mp3"),
+    "Harry Potter":              mp3_url("Harry Potter.mp3"),
+    "Pirates Of The Caribbean":  mp3_url("Pirates of the Caribbean.mp3"),
+    "Star Wars":                 mp3_url("Star Wars.mp3"),
+    "The Godfather":             mp3_url("The Godfather.mp3"),
+    "Gladiator":                 mp3_url("Gladiator.mp3"),
+    "Yeni Şarkı":                mp3_url("Yeni Şarkı.mp3"),
+}
+
+turkce_songs = {
+    "Ağlama Ben Ağlarım": mp3_url("Ağlama Ben Ağlarım.mp3"),
+    "Yeni Şarkı":         mp3_url("Yeni Şarkı.mp3"),  # ← buraya
+}
